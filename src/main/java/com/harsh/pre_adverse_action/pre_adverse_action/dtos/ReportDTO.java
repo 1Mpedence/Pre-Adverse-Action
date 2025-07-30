@@ -1,6 +1,5 @@
 package com.harsh.pre_adverse_action.pre_adverse_action.dtos;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.sql.Timestamp;

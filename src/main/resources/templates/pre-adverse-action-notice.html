@@ -1,34 +1,35 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Pre-Adverse Action</title>
-</head>
-<body>
-<p>Dear <span th:text="${name}">John Smith</span>,</p>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<p>
-    You recently authorized checkr-bpo (“the company”) to obtain consumer reports and/or investigate consumer reports about you from a consumer reporting agency.
-    The Company is considering taking action based on the following charges:
-</p>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pre-Adverse Action</title>
+    </head>
+    <body>
+        <p>Dear <span th:text="${name}">John Smith</span>,</p>
 
-<form>
-    <ul>
-        <li th:each="charge : ${charges}">
-            <label>
-                <input th:if="${edit}" type="checkbox"> <span th:text="${charge}">Charge Name</span>
-                <span th:if="${!edit}" th:text="${charge}">Charge Name</span>
-            </label>
-        </li>
-    </ul>
-</form>
+        <p>
+            You recently authorized checkr-bpo (“the company”) to obtain consumer reports and/or investigate consumer reports about you from a consumer reporting agency.
+            The Company is considering taking action based on the following charges:
+        </p>
 
-<p>
-    If you wish to dispute the accuracy of the information in the report directly with the consumer reporting agency
-    (i.e., the source of the information contained in the report), you should contact the agency identified above directly.
-</p>
+        <form>
+            <ul>
+                <li th:each="charge : ${charges}">
+                    <label>
+                        <input th:if="${edit}" type="checkbox"> <span th:text="${charge}">Charge Name</span>
+                        <span th:if="${!edit}" th:text="${charge}">Charge Name</span>
+                    </label>
+                </li>
+            </ul>
+        </form>
 
-<p>Sincerely,</p>
-<p>Checkr-bpo</p>
-</body>
+        <p>
+            If you wish to dispute the accuracy of the information in the report directly with the consumer reporting agency
+            (i.e., the source of the information contained in the report), you should contact the agency identified above directly.
+        </p>
+
+        <p>Sincerely,</p>
+        <p>Checkr-bpo</p>
+    </body>
 </html>

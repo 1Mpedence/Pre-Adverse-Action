@@ -8,6 +8,7 @@ class PreAdverseActionApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// This test ensures the Spring Boot application context loads without errors.
 	}
 
 }

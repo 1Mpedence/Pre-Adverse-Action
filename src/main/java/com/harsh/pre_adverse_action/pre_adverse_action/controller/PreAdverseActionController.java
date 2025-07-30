@@ -1,10 +1,9 @@
 package com.harsh.pre_adverse_action.pre_adverse_action.controller;
 
 import com.harsh.pre_adverse_action.pre_adverse_action.dtos.*;
-import com.harsh.pre_adverse_action.pre_adverse_action.responseDto.Response;
+import com.harsh.pre_adverse_action.pre_adverse_action.exceptions.PreAdverseActionError;
 import com.harsh.pre_adverse_action.pre_adverse_action.service.PreAdverseActionService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(candidates);
         } catch (Exception ex) {
             log.error("Error fetching candidates", ex);
-            throw new RuntimeException("Failed to fetch candidates", ex);
+            throw new PreAdverseActionError("Failed to fetch candidates", ex);
         }
     }
 
@@ -42,7 +41,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(candidate);
         } catch (Exception ex) {
             log.error("Error fetching candidate details for ID {}", id, ex);
-            throw new RuntimeException("Failed to fetch candidates for id:" + id, ex);
+            throw new PreAdverseActionError("Failed to fetch candidates for id:" + id, ex);
         }
     }
 
@@ -54,7 +53,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(report);
         } catch (Exception ex) {
             log.error("Error fetching report for candidate ID {}", id, ex);
-            throw new RuntimeException("Error fetching report for candidate ID" + id, ex);
+            throw new PreAdverseActionError("Error fetching report for candidate ID" + id, ex);
         }
     }
 
@@ -66,7 +65,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(courtSearches);
         } catch (Exception ex) {
             log.error("Error fetching court searches for candidate ID {}", id, ex);
-            throw new RuntimeException("Error fetching court searches for candidate ID" + id, ex);
+            throw new PreAdverseActionError("Error fetching court searches for candidate ID" + id, ex);
         }
     }
 
@@ -81,7 +80,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(candidates);
         } catch (Exception ex) {
             log.error("Error fetching candidates", ex);
-            throw new RuntimeException("Error fetching candidates", ex);
+            throw new PreAdverseActionError("Error fetching candidates", ex);
         }
     }
 
@@ -93,7 +92,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body(emailInfo);
         } catch (Exception ex) {
             log.error("Error fetching pre-adverse email info for candidate ID {}", candidateId, ex);
-            throw new RuntimeException("Error while fetching email body for candidateId {}" + candidateId);
+            throw new PreAdverseActionError("Error while fetching email body for candidateId {}" + candidateId, ex);
         }
     }
 
@@ -105,7 +104,7 @@ public class PreAdverseActionController {
             return ResponseEntity.status(HttpStatus.OK).body("Pre-Advance Action Notice successfully sent.");
         } catch (Exception ex) {
             log.error("Error sending pre-adverse action notice for candidate ID {}", candidateId, ex);
-            throw new RuntimeException("Error while sending pre-adverse email for candidateId" + candidateId);
+            throw new PreAdverseActionError("Error while sending pre-adverse email for candidateId" + candidateId, ex);
         }
     }
 }
