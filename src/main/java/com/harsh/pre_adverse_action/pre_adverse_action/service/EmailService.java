@@ -1,5 +1,6 @@
 package com.harsh.pre_adverse_action.pre_adverse_action.service;
 
+import com.harsh.pre_adverse_action.pre_adverse_action.exceptions.PreAdverseActionError;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.mail.SimpleMailMessage;
@@ -23,7 +24,7 @@ public class EmailService {
             log.info("Pre-adverse action email sent successfully to {}", message);
         } catch (Exception e) {
             log.error("Failed to send email to {}", message, e);
-            throw new RuntimeException("Failed to send email", e);
+            throw new PreAdverseActionError("Failed to send email", e);
         }
     }
 }

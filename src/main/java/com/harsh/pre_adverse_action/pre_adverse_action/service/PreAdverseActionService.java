@@ -7,6 +7,7 @@ import com.harsh.pre_adverse_action.pre_adverse_action.dtos.*;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Candidate;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.CourtSearch;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Report;
+import com.harsh.pre_adverse_action.pre_adverse_action.exceptions.PreAdverseActionError;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.CandidateRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.CourtSearchRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.ReportRepository;
@@ -38,6 +39,8 @@ public class PreAdverseActionService {
     private final TemplateEngine templateEngine;
     private final EmailService emailService;
 
+    private final String CANDIDATE_NOT_FOUND_ERROR = "Candidate not found with ID: ";
+
     public PreAdverseActionService(
             CandidateRepository candidateRepository,
             ReportRepository reportRepository,
@@ -63,7 +66,7 @@ public class PreAdverseActionService {
             return this.jsonMapper.convertValue(candidates, new TypeReference<List<CandidateDTO>>() {});
         } catch (Exception e) {
             log.error("Error while converting candidates to DTOs", e);
-            throw new RuntimeException("Unable to fetch candidates", e);
+            throw new PreAdverseActionError("Unable to fetch candidates", e);
         }
     }
 
@@ -73,12 +76,12 @@ public class PreAdverseActionService {
             Candidate candidate = this.candidateRepository.findById(id)
                     .orElseThrow(() -> {
                         log.warn("Candidate not found for ID: {}", id);
-                        return new NoSuchElementException("Candidate not found with ID: " + id);
+                        return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + id);
                     });
             return this.jsonMapper.convertValue(candidate, CandidateDTO.class);
         } catch (Exception e) {
             log.error("Error while fetching candidate details for ID: {}", id, e);
-            throw new RuntimeException("Unable to fetch candidate details", e);
+            throw new PreAdverseActionError("Unable to fetch candidate details", e);
         }
     }
 
@@ -93,7 +96,7 @@ public class PreAdverseActionService {
             return this.jsonMapper.convertValue(report, ReportDTO.class);
         } catch (Exception e) {
             log.error("Error while fetching report for candidate ID: {}", id, e);
-            throw new RuntimeException("Unable to fetch candidate report", e);
+            throw new PreAdverseActionError("Unable to fetch candidate report", e);
         }
     }
 
@@ -104,7 +107,7 @@ public class PreAdverseActionService {
             return this.jsonMapper.convertValue(searches, new TypeReference<List<CourtSearchDTO>>() {});
         } catch (Exception e) {
             log.error("Error while fetching court searches for candidate ID: {}", id, e);
-            throw new RuntimeException("Unable to fetch court searches", e);
+            throw new PreAdverseActionError("Unable to fetch court searches", e);
         }
     }
 
@@ -114,7 +117,7 @@ public class PreAdverseActionService {
             return this.dao.findAllCandidateReportSummaries(search, adjudication, status);
         } catch (Exception e) {
             log.error("Error while fetching candidate report summaries", e);
-            throw new RuntimeException("Unable to fetch report summaries", e);
+            throw new PreAdverseActionError("Unable to fetch report summaries", e);
         }
     }
 
@@ -124,7 +127,7 @@ public class PreAdverseActionService {
             Candidate candidate = this.candidateRepository.findById(id)
                     .orElseThrow(() -> {
                         log.warn("Candidate not found for ID: {}", id);
-                        return new NoSuchElementException("Candidate not found with ID: " + id);
+                        return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + id);
                     });
 
 
@@ -164,7 +167,7 @@ public class PreAdverseActionService {
             return emailInfo;
         } catch (Exception e) {
             log.error("Error while preparing email info for candidate ID: {}", id, e);
-            throw new RuntimeException("Unable to prepare email info", e);
+            throw new PreAdverseActionError("Unable to prepare email info", e);
         }
     }
 
@@ -173,7 +176,7 @@ public class PreAdverseActionService {
         try {
             Candidate candidate = this.candidateRepository.findById(candidateId).orElseThrow(() -> {
                 log.warn("Candidate not found with ID: {}", candidateId);
-                return new NoSuchElementException("Candidate not found with ID: " + candidateId);
+                return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + candidateId);
             });
 
             Report report = this.reportRepository.findByCandidateId(candidateId)
@@ -209,7 +212,7 @@ public class PreAdverseActionService {
 
         } catch (Exception e) {
             log.error("Error while sending pre-adverse action notice for candidate ID: {}", candidateId, e);
-            throw new RuntimeException("Unable to send notice", e);
+            throw new PreAdverseActionError("Unable to send notice", e);
         }
     }
 }

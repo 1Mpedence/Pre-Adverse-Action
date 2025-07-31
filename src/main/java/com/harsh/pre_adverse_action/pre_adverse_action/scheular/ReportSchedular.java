@@ -3,6 +3,7 @@ package com.harsh.pre_adverse_action.pre_adverse_action.scheular;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Candidate;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Report;
+import com.harsh.pre_adverse_action.pre_adverse_action.exceptions.PreAdverseActionError;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.CandidateRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.ReportRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.service.EmailService;
@@ -104,7 +105,7 @@ public class ReportSchedular {
 
         } catch (Exception e) {
             log.error("Error while sending pre-adverse action notice for candidate ID: {}", candidateId, e);
-            throw new RuntimeException("Unable to send notice", e);
+            throw new PreAdverseActionError("Unable to send notice", e);
         }
     }
 }
