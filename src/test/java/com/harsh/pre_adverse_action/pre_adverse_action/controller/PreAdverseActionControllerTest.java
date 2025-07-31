@@ -141,9 +141,9 @@ class PreAdverseActionControllerTest {
     @Test
     void sendPreAdverseNotice_failure_throws() {
         doThrow(new RuntimeException("err")).when(service).sendNotice(eq(1L), any());
-
+        PreAdverseActionEmailInfoDto dto = PreAdverseActionEmailInfoDto.builder().build();
         PreAdverseActionError exception = assertThrows(PreAdverseActionError.class,
-                () -> controller.sendPreAdverseNotice(1L, PreAdverseActionEmailInfoDto.builder().build()));
+                () -> controller.sendPreAdverseNotice(1L, dto));
         assertTrue(exception.getMessage().contains("Error while sending pre-adverse email for candidateId"));
     }
 }

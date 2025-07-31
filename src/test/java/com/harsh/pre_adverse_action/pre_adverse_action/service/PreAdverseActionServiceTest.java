@@ -235,13 +235,15 @@ class PreAdverseActionServiceTest {
     @Test
     void sendNotice_candidateNotFound_throws() {
         when(candidateRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.sendNotice(1L, new PreAdverseActionEmailInfoDto()));
+        PreAdverseActionEmailInfoDto dto = new PreAdverseActionEmailInfoDto();
+        assertThrows(RuntimeException.class, () -> service.sendNotice(1L, dto));
     }
 
     @Test
     void sendNotice_reportNotFound_throws() {
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(new Candidate()));
         when(reportRepository.findByCandidateId(1L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.sendNotice(1L, new PreAdverseActionEmailInfoDto()));
+        PreAdverseActionEmailInfoDto dto = new PreAdverseActionEmailInfoDto();
+        assertThrows(RuntimeException.class, () -> service.sendNotice(1L, dto));
     }
 }
