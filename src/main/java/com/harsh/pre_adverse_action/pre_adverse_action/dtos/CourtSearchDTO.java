@@ -5,9 +5,6 @@ import lombok.*;
 import java.sql.Timestamp;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class CourtSearchDTO {
     private Long id;
     private Long candidateId;
