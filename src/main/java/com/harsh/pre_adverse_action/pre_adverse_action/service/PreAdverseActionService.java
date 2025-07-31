@@ -39,7 +39,7 @@ public class PreAdverseActionService {
     private final TemplateEngine templateEngine;
     private final EmailService emailService;
 
-    private final String CANDIDATE_NOT_FOUND_ERROR = "Candidate not found with ID: ";
+    private static final String CANDIDATENOTFOUNDERROR = "Candidate not found with ID: ";
 
     public PreAdverseActionService(
             CandidateRepository candidateRepository,
@@ -76,7 +76,7 @@ public class PreAdverseActionService {
             Candidate candidate = this.candidateRepository.findById(id)
                     .orElseThrow(() -> {
                         log.warn("Candidate not found for ID: {}", id);
-                        return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + id);
+                        return new NoSuchElementException(CANDIDATENOTFOUNDERROR + id);
                     });
             return this.jsonMapper.convertValue(candidate, CandidateDTO.class);
         } catch (Exception e) {
@@ -127,7 +127,7 @@ public class PreAdverseActionService {
             Candidate candidate = this.candidateRepository.findById(id)
                     .orElseThrow(() -> {
                         log.warn("Candidate not found for ID: {}", id);
-                        return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + id);
+                        return new NoSuchElementException(CANDIDATENOTFOUNDERROR + id);
                     });
 
 
@@ -176,7 +176,7 @@ public class PreAdverseActionService {
         try {
             Candidate candidate = this.candidateRepository.findById(candidateId).orElseThrow(() -> {
                 log.warn("Candidate not found with ID: {}", candidateId);
-                return new NoSuchElementException(CANDIDATE_NOT_FOUND_ERROR + candidateId);
+                return new NoSuchElementException(CANDIDATENOTFOUNDERROR + candidateId);
             });
 
             Report report = this.reportRepository.findByCandidateId(candidateId)
