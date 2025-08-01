@@ -100,9 +100,6 @@ public class ReportSchedular {
             emailService.sendEmail(simpleMailMessage);
 
             report.setAdjudication("ADVERSE ACTION");
-
-//            String selectedCharges = jsonMapper.writeValueAsString(report.getSelectedCharges());
-//            report.setSelectedCharges(selectedCharges);
             report.setLastNotificationSent(Timestamp.valueOf(LocalDateTime.now()));
 
             this.reportRepository.save(report);
