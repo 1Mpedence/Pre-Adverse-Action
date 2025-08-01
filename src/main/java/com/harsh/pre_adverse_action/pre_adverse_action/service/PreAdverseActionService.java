@@ -21,6 +21,7 @@ import org.thymeleaf.context.Context;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -130,15 +131,8 @@ public class PreAdverseActionService {
                         return new NoSuchElementException(CANDIDATENOTFOUNDERROR + id);
                     });
 
-
-            Report report = this.reportRepository.findByCandidateId(id).orElseThrow(() -> {
-                log.warn("Report not fround for Candidate for ID: {}", id);
-                return new NoSuchElementException("Report not fround for Candidate for ID: " + id);
-            });
-
-            String availableChargesJson = report.getAvailableCharges();
-            List<String> availableCharges = jsonMapper.readValue(availableChargesJson, new TypeReference<List<String>>() {});
-
+            List<CourtSearch> courtSearches = courtSearchRepository.findByCandidateIdAndStatus(id, "CONSIDER");
+            List<String> availableCharges = courtSearches.stream().map(CourtSearch::getSearch).collect(Collectors.toList());
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(preAdverseActionEmail);
@@ -199,10 +193,9 @@ public class PreAdverseActionService {
 
             emailService.sendEmail(simpleMailMessage);
 
-            report.setAdjudication("ADVERSE ACTION");
+            dao.updateCourtSearchesStatus(request.getAvailableCharges());
 
-            String selectedCharges = jsonMapper.writeValueAsString(request.getAvailableCharges());
-            report.setSelectedCharges(selectedCharges);
+            report.setAdjudication("ADVERSE ACTION");
             report.setAutoSendDuration(request.getAutoSendDuration());
             report.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
             report.setLastNotificationSent(Timestamp.valueOf(LocalDateTime.now()));

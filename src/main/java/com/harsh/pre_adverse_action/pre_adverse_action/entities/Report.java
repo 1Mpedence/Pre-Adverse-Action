@@ -48,11 +48,4 @@ public class Report {
 
     @Column(name = "last_notification_sent ")
     private Timestamp lastNotificationSent ;
-
-    @Column(name = "available_charges", columnDefinition = "json")
-    private String availableCharges;
-
-    @Column(name = "selected_charges", columnDefinition = "json")
-    private String selectedCharges;
-
 }

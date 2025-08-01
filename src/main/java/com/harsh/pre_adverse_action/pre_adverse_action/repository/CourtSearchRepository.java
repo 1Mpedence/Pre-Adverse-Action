@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CourtSearchRepository extends JpaRepository<CourtSearch, Integer> {
     List<CourtSearch> findByCandidateId(Long candidateId);
+
+    List<CourtSearch> findByCandidateIdAndStatus(Long candidateId, String status);
 }

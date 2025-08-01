@@ -1,10 +1,11 @@
 package com.harsh.pre_adverse_action.pre_adverse_action.scheular;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Candidate;
+import com.harsh.pre_adverse_action.pre_adverse_action.entities.CourtSearch;
 import com.harsh.pre_adverse_action.pre_adverse_action.entities.Report;
 import com.harsh.pre_adverse_action.pre_adverse_action.exceptions.PreAdverseActionError;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.CandidateRepository;
+import com.harsh.pre_adverse_action.pre_adverse_action.repository.CourtSearchRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.repository.ReportRepository;
 import com.harsh.pre_adverse_action.pre_adverse_action.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,14 +35,14 @@ public class ReportSchedular {
 
     private final ReportRepository reportRepository;
     private final CandidateRepository candidateRepository;
-    private final ObjectMapper jsonMapper;
+    private final CourtSearchRepository courtSearchRepository;
     private final TemplateEngine templateEngine;
     private final EmailService emailService;
 
-    ReportSchedular(ReportRepository reportRepository, CandidateRepository candidateRepository, ObjectMapper jsonMapper, TemplateEngine templateEngine, EmailService emailService) {
+    ReportSchedular(ReportRepository reportRepository, CandidateRepository candidateRepository, CourtSearchRepository courtSearchRepository, TemplateEngine templateEngine, EmailService emailService) {
         this.reportRepository = reportRepository;
         this.candidateRepository = candidateRepository;
-        this.jsonMapper = jsonMapper;
+        this.courtSearchRepository = courtSearchRepository;
         this.templateEngine = templateEngine;
         this.emailService = emailService;
     }
@@ -85,9 +87,12 @@ public class ReportSchedular {
             simpleMailMessage.setTo(candidate.getEmail());
             simpleMailMessage.setSubject(preAdverseActionSubject);
 
+            List<CourtSearch> courtSearches = courtSearchRepository.findByCandidateIdAndStatus(candidateId, "CONSIDER");
+            List<String> charges = courtSearches.stream().map(CourtSearch::getSearch).collect(Collectors.toList());
+
             Context context = new Context();
             context.setVariable("name", candidate.getName());
-            context.setVariable("charges", report.getSelectedCharges());
+            context.setVariable("charges", charges);
             context.setVariable("edit", false);
             String htmlContent = templateEngine.process("pre-adverse-action-notice", context);
             simpleMailMessage.setText(htmlContent);
@@ -96,8 +101,8 @@ public class ReportSchedular {
 
             report.setAdjudication("ADVERSE ACTION");
 
-            String selectedCharges = jsonMapper.writeValueAsString(report.getSelectedCharges());
-            report.setSelectedCharges(selectedCharges);
+//            String selectedCharges = jsonMapper.writeValueAsString(report.getSelectedCharges());
+//            report.setSelectedCharges(selectedCharges);
             report.setLastNotificationSent(Timestamp.valueOf(LocalDateTime.now()));
 
             this.reportRepository.save(report);

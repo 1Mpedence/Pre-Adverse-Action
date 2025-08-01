@@ -17,6 +17,4 @@ public class ReportDTO {
     private Timestamp turnAroundTime;
     private Long autoSendDuration;
     private Timestamp lastNotificationSent;
-    private String availableCharges;
-    private String selectedCharges;
 }

@@ -38,4 +38,13 @@ public class Dao {
         parameter.addValue("status", status);
         return namedParameterJdbcTemplate.query(sql, parameter, new BeanPropertyRowMapper<>(CandidateReportSummaryDTO.class));
     }
+
+    public void updateCourtSearchesStatus(List<String> names) {
+        String sql = "UPDATE court_searches SET status = CASE WHEN search IN (:names) THEN 'CONSIDER' ELSE 'CLEAR' END";
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("names", names);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
 }

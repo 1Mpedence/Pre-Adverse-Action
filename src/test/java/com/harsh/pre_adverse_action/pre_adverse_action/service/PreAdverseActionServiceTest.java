@@ -166,29 +166,29 @@ class PreAdverseActionServiceTest {
         assertThrows(RuntimeException.class, () -> service.getCandidateReportSummaryDTO(null, null, null));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void getEmailInfo_success() throws Exception {
         Candidate candidate = new Candidate();
+        candidate.setId(1L);
         candidate.setEmail("candidate@example.com");
         candidate.setName("John Doe");
 
-        Report report = new Report();
-        report.setAvailableCharges("[\"Charge1\",\"Charge2\"]");
+        CourtSearch cs1 = new CourtSearch();
+        cs1.setSearch("Driving while license suspended");
+        CourtSearch cs2 = new CourtSearch();
+        cs2.setSearch("Global Watchlist");
 
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
-        when(reportRepository.findByCandidateId(1L)).thenReturn(Optional.of(report));
-        when(jsonMapper.readValue(eq(report.getAvailableCharges()), any(TypeReference.class)))
-                .thenReturn(List.of("Charge1", "Charge2"));
-        when(templateEngine.process(eq("pre-adverse-action-notice"), any(Context.class))).thenReturn("Email Body");
+        when(courtSearchRepository.findByCandidateIdAndStatus(1L, "CONSIDER")).thenReturn(Arrays.asList(cs1, cs2));
 
-        PreAdverseActionEmailInfoDto emailInfo = service.getEmailInfo(1L);
+        PreAdverseActionEmailInfoDto result = service.getEmailInfo(1L);
 
-        assertNotNull(emailInfo);
-        assertEquals(List.of("Charge1", "Charge2"), emailInfo.getAvailableCharges());
-        assertEquals("candidate@example.com", emailInfo.getSimpleMessage().getTo()[0]);
+        verify(candidateRepository).findById(1L);
+        verify(courtSearchRepository).findByCandidateIdAndStatus(1L, "CONSIDER");
+
+        assertNotNull(result);
+        assertEquals(Arrays.asList("Driving while license suspended", "Global Watchlist"), result.getAvailableCharges());
     }
-
 
     @Test
     void getEmailInfo_candidateNotFound_throws() {
@@ -197,37 +197,35 @@ class PreAdverseActionServiceTest {
     }
 
     @Test
-    void getEmailInfo_reportNotFound_throws() {
-        when(candidateRepository.findById(1L)).thenReturn(Optional.of(new Candidate()));
-        when(reportRepository.findByCandidateId(1L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.getEmailInfo(1L));
-    }
-
-    @Test
     void sendNotice_success() throws Exception {
         Candidate candidate = new Candidate();
+        candidate.setId(1L);
         candidate.setEmail("candidate@example.com");
         candidate.setName("John Doe");
 
         Report report = new Report();
 
+        CourtSearch cs1 = new CourtSearch();
+        cs1.setSearch("Driving while license suspended");
+        CourtSearch cs2 = new CourtSearch();
+        cs2.setSearch("Global Watchlist");
+
         PreAdverseActionEmailInfoDto request = PreAdverseActionEmailInfoDto.builder()
                 .simpleMessage(SimpleMailMessageDTO.builder().subject("Subject").build())
-                .availableCharges(List.of("Charge1"))
+                .availableCharges(List.of("Driving while license suspended", "Global Watchlist"))
                 .autoSendDuration(10L)
                 .build();
 
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
         when(reportRepository.findByCandidateId(1L)).thenReturn(Optional.of(report));
+        when(courtSearchRepository.findByCandidateIdAndStatus(1L, "CONSIDER")).thenReturn(Arrays.asList(cs1, cs2));
         when(templateEngine.process(eq("pre-adverse-action-notice"), any(Context.class))).thenReturn("Email Body");
-        when(jsonMapper.writeValueAsString(any())).thenReturn("[\"Charge1\"]");
         when(reportRepository.save(report)).thenReturn(report);
 
         assertDoesNotThrow(() -> service.sendNotice(1L, request));
 
         verify(emailService).sendEmail(any(SimpleMailMessage.class));
         assertEquals("ADVERSE ACTION", report.getAdjudication());
-        assertEquals("[\"Charge1\"]", report.getSelectedCharges());
         assertNotNull(report.getUpdatedAt());
         assertNotNull(report.getLastNotificationSent());
     }
